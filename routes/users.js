@@ -1,4 +1,5 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+const { connect } = require('../connect.js');
 
 const {
   requireAuth,
@@ -9,8 +10,10 @@ const {
   getUsers,
 } = require('../controller/users');
 
-const initAdminUser = (app, next) => {
+const initAdminUser = async (app, next) => {
   const { adminEmail, adminPassword } = app.get('config');
+  console.log('admindata', { adminEmail, adminPassword });
+
   if (!adminEmail || !adminPassword) {
     return next();
   }
@@ -22,8 +25,26 @@ const initAdminUser = (app, next) => {
   };
 
   // TODO: crear usuaria admin
-  // Primero ver si ya existe adminUser en base de datos
-  // si no existe, hay que guardarlo
+  try {
+    const { client, db } = await connect();
+    const usersCollection = db.collection('Users');
+
+    // Comprueba si ya existe un usuario con el correo de administrador
+    const existingAdminUser = await usersCollection.findOne({ email: adminEmail });
+
+    if (!existingAdminUser) {
+      // Si no existe, crea el usuario administrador
+      await usersCollection.insertOne(adminUser);
+      console.log('Usuario administrador creado con éxito.');
+    } else {
+      console.log('El usuario administrador ya existe en la base de datos.');
+    }
+
+    // Asegúrate de cerrar la conexión después de usarla.
+    await client.close();
+  } catch (error) {
+    console.error('Error al conectar a la base de datos:', error);
+  }
 
   next();
 };

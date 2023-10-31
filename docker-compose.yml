@@ -20,7 +20,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 8080
-      DB_URL: "mongodb://bq:bqapi123@127.0.0.1:27017/bq?authSource=admin"
+      DB_URL: "mongodb+srv://aurapinilla12:Kyra1234%23@cluster0.gxpuzxe.mongodb.net/"
       JWT_SECRET: xxxxxxxx
       ADMIN_EMAIL: admin@localhost
       ADMIN_PASSWORD: changeme

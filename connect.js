@@ -16,18 +16,18 @@ const client = new MongoClient(uri, {
 
 async function connect() {
   try {
-    // TODO: Conexión a la Base de Datos
+    // Conectar a la base de datos
     await client.connect();
+    console.log('Pinged your deployment. You successfully connected to MongoDB!');
 
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  }
-  finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+    // Obtener la base de datos
+    const db = client.db('bqapi-database');
+
+    return { client, db };
+  } catch (error) {
+    console.error('Error al conectar a la base de datos:', error);
+    throw error;
   }
 }
-connect().catch(console.dir);
 
 module.exports = { connect };
