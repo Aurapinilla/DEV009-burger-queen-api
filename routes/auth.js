@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-
+const { connect } = require('../connect');
+const bcrypt = require('bcryptjs');
 const { secret } = config;
 
 /** @module auth */
@@ -17,20 +18,51 @@ module.exports = (app, nextMain) => {
    * @code {400} si no se proveen `email` o `password` o ninguno de los dos
    * @auth No requiere autenticación
    */
-  app.post('/auth', (req, resp, next) => {
+  app.post('/login', async (req, resp, next) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return next(400);
-    }
+    try {
+      if (!email || !password) {
+        return resp.status(400).send({ error: 'Email and password are required.' });
+      } else {
+        const { client, db } = await connect();
+        const usersCollection = db.collection('Users');
+        const userExists = await usersCollection.findOne({ email: email });
 
-    // TODO: autenticar a la usuarix
-    // Hay que confirmar si el email y password
-    // coinciden con un user en la base de datos
-    // Si coinciden, manda un access token creado con jwt
+        if (!userExists) {
+          return resp.status(404).send({ error: 'User not found.' });
+        }
+
+        // Solo después de verificar que el usuario existe, se compara la contraseña
+        const passwordMatches = bcrypt.compareSync(password, userExists.password);
+
+        if (passwordMatches) {
+          try {
+            const token = jwt.sign({
+              id: userExists.id,
+              role: userExists.role,
+            }, secret, { expiresIn: '1h' });
+
+            return resp.status(200).send({ accessToken: token });
+          } catch (tokenError) {
+            if (tokenError.name === 'TokenExpiredError') {
+              return resp.status(401).send({ error: 'Token expired.' });
+            } else {
+              return resp.status(401).send({ error: 'Invalid token.' });
+            }
+          }
+        } else {
+          return resp.status(404).send({ error: 'Invalid password.' });
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      return resp.status(401).send({ error: error.message });
+    }
 
     next();
   });
+
 
   return nextMain();
 };

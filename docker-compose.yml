@@ -22,8 +22,8 @@ services:
       PORT: 8080
       DB_URL: "mongodb+srv://aurapinilla12:Kyra1234%23@cluster0.gxpuzxe.mongodb.net/"
       JWT_SECRET: xxxxxxxx
-      ADMIN_EMAIL: admin@localhost
-      ADMIN_PASSWORD: changeme
+      ADMIN_EMAIL: aura.pinilla12@gmail.com
+      ADMIN_PASSWORD: bqadmin123
     volumes:
       - ./:/home/node/app # montamos el codigo en el HOME del usuario _node_
     expose:
