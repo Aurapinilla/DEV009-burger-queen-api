@@ -1,0 +1,13 @@
+POST http://localhost:8080/login 
+content-type: application/json
+
+{
+    "email": "aura.pinilla12@gmail.com",
+    "password": "bqadmin123"
+}
+
+//eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTkzMDc0NzAsImV4cCI6MTY5OTMxMTA3MH0.iktXl0vbuGJqKx-oa4Hd5xUfuR7dmmn35A3Wu_ov2ok
+
+GET http://localhost:8080/users HTTP/1.1
+content-type: application/json
+authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1NDE1MTE0YmQ2MmFjOTJhOWE3MTk5MCIsImlhdCI6MTY5OTQxMDU5OSwiZXhwIjoxNjk5NDE0MTk5fQ.NGzhS0rum6f1S8SyEzdr3bp1WtVbOnyjrl-u-yLENaI

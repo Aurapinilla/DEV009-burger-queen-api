@@ -9,7 +9,7 @@ module.exports = (app, nextMain) => {
   /**
    * @name /auth
    * @description Crea token de autenticación.
-   * @path {POST} /auth
+   * @path {POST} /login
    * @body {String} email Correo
    * @body {String} password Contraseña
    * @response {Object} resp
@@ -30,18 +30,19 @@ module.exports = (app, nextMain) => {
         const userExists = await usersCollection.findOne({ email: email });
 
         if (!userExists) {
-          return resp.status(404).send({ error: 'User not found.' });
+          return resp.status(404).send({ error: 'No user found.' });
         }
 
-        // Solo después de verificar que el usuario existe, se compara la contraseña
         const passwordMatches = bcrypt.compareSync(password, userExists.password);
 
         if (passwordMatches) {
           try {
             const token = jwt.sign({
-              id: userExists.id,
-              role: userExists.role,
+              id: userExists._id,
+              role: userExists.roles.admin ? 'admin' : 'user',
             }, secret, { expiresIn: '1h' });
+
+            console.log('tokenn', token);
 
             return resp.status(200).send({ accessToken: token });
           } catch (tokenError) {
